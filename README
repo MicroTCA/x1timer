@@ -1,10 +1,10 @@
                              The X1TIMER Linux device driver
                              
-The DAMC device driver designed to provide access to the memmory and IO space of the X1TIMER module.
+The DAMC device driver designed to provide access to the memmory and IO space of the X1TIMER, X2TIMER and NAMC-psTimer module.
 As well to make DMA transfer from X1TIMER module to host memmory space.
 
 Installation:
-The driver file should to be installed in the /lib/modules/`uname -r'/doocs directory.
+The driver file should be installed in the /lib/modules/`uname -r'/doocs directory.
 (create this  directory: "sudo mkdir /lib/modules/`uname -r'/doocs" )
 
 Creating udev rules (Ubuntu 8.x for other Linux versions read the udev manual):
@@ -18,15 +18,15 @@ SUBSYSTEM=="x1timer",      MODE="066"
     KERNEL=="x1timers1",     SYMLINK="x1timer2"
     KERNEL=="x1timers2",     SYMLINK="x1timer0"
  
-for UBUNTU 10.x one has to craete the files 40-permissions.rules and 60-symlinks.rules in the /etc/udev/rules.d directory.
+For UBUNTU 10.x one has to craete the files 40-permissions.rules and 60-symlinks.rules in the /etc/udev/rules.d directory.
 
 Call "depmod -a" and try to load the driver calling "modprobe x1timer"
 To unload the driver call rmmod x1timer.
 
-One can check the messages frm driver calling "sudo tail -f /var/log/kern.log" 
+One can check the messages from the driver by calling "sudo tail -f /var/log/kern.log" 
 
 The driver during loading creates the "x1timer" class in /sys/class and device nodes x1timersX in /dev 
-directory. There X is a slot number in which the module is installed. To have standart device names 
+directory. There X is a slot number in which the module is installed. To have standard device names 
 (for example x1timer0 or x1timer1) one should create udev rules.
    
 Using the driver:
