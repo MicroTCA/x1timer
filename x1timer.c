@@ -3,18 +3,18 @@
 *
 *This file is part of X1TIMER driver.
 *
-*Foobar is free software: you can redistribute it and/or modify
+*X1TIMER is free software: you can redistribute it and/or modify
 *it under the terms of the GNU General Public License as published by
 *the Free Software Foundation, either version 3 of the License, or
 *(at your option) any later version.
 *
-*Foobar is distributed in the hope that it will be useful,
+*X1TIMER is distributed in the hope that it will be useful,
 *but WITHOUT ANY WARRANTY; without even the implied warranty of
 *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *GNU General Public License for more details.
 *
 *You should have received a copy of the GNU General Public License
-*along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*along with X1TIMER.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
 
@@ -65,10 +65,10 @@
 
 MODULE_AUTHOR("Lyudvig Petrosyan");
 MODULE_DESCRIPTION("AMC x1timer board driver");
-MODULE_VERSION("4.4.0");
+MODULE_VERSION("5.0.0");
 MODULE_LICENSE("Dual BSD/GPL");
-static u_short X1TIMER_DRV_VER_MAJ = 4;
-static u_short X1TIMER_DRV_VER_MIN = 4;
+static u_short X1TIMER_DRV_VER_MAJ = 5;
+static u_short X1TIMER_DRV_VER_MIN = 0;
 
 int X1TIMER_MAJOR = 48;    /* major by default */
 int X1TIMER_MINOR = 0 ;    /* minor by default */
@@ -1834,7 +1834,7 @@ static long  x1timer_ioctl(struct file *filp, unsigned int cmd, unsigned long ar
 					mutex_unlock(&dev->dev_mut);
 					return retval;
 				}
-				iowrite32 (tmp_data_32, address + + aIocRW.offset_rw + vi*4);
+				iowrite32 (tmp_data_for_rw, address + aIocRW.offset_rw + vi*4);
 				smp_wmb();
 			}
 		}
