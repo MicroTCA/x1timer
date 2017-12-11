@@ -1,4 +1,4 @@
-**
+/**
 *Copyright 2016-  DESY (Deutsches Elektronen-Synchrotron, www.desy.de)
 *
 *This file is part of X1TIMER driver.
@@ -54,6 +54,13 @@
 #include <linux/kdev_t.h>
 #include <linux/device.h>
 #include <linux/swap.h>
+
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,13,0)
+	#include <linux/sched/signal.h>
+#else 
+#endif
+
 //#include <asm/scatterlist.h>
 #include <asm/io.h>
 #include <asm/atomic.h>

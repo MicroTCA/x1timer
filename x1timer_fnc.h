@@ -1,4 +1,4 @@
-**
+/**
 *Copyright 2016-  DESY (Deutsches Elektronen-Synchrotron, www.desy.de)
 *
 *This file is part of X1TIMER driver.
