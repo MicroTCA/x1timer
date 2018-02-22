@@ -72,10 +72,10 @@
 
 MODULE_AUTHOR("Lyudvig Petrosyan");
 MODULE_DESCRIPTION("AMC x1timer board driver");
-MODULE_VERSION("5.0.0");
+MODULE_VERSION("5.1.0");
 MODULE_LICENSE("Dual BSD/GPL");
 static u_short X1TIMER_DRV_VER_MAJ = 5;
-static u_short X1TIMER_DRV_VER_MIN = 0;
+static u_short X1TIMER_DRV_VER_MIN = 1;
 
 int X1TIMER_MAJOR = 48;    /* major by default */
 int X1TIMER_MINOR = 0 ;    /* minor by default */
@@ -1786,22 +1786,19 @@ static long  x1timer_ioctl(struct file *filp, unsigned int cmd, unsigned long ar
 
         case X1TIMER_SET_TIMER:
             retval = 0;
-            if (dev->timer_offset) {
                 do_gettimeofday (&tv);
                 dev->board_sec =  tv.tv_sec;
                 dev->board_usec = tv.tv_usec;
+	      data.offset = dev->board_usec;
+                data.data   = dev->board_sec;
+	      data.reserved   = dev->timer_offset;
+	 if (dev->timer_offset) {
                 /* set absolute time */
                 tmp_data_32 = dev->board_sec;
                 iowrite32 (tmp_data_32, address + dev->timer_offset + 4);
                 tmp_data_32 = dev->board_usec;
                 iowrite32 (tmp_data_32, address + dev->timer_offset);
-                data.offset = dev->board_usec;
-                data.data   = dev->board_sec;
-            } else {
-                dev->board_sec  = 0;
-                dev->board_usec = 0;
-                data.data       = 0;
-                data.offset     = 0;	
+                
             }
             if (copy_to_user((device_ioctrl_data*)arg, &data, (size_t)size_data)) {
                 retval = -EFAULT;
