@@ -72,10 +72,10 @@
 
 MODULE_AUTHOR("Lyudvig Petrosyan");
 MODULE_DESCRIPTION("AMC x1timer board driver");
-MODULE_VERSION("5.1.0");
+MODULE_VERSION("6.0.0");
 MODULE_LICENSE("Dual BSD/GPL");
-static u_short X1TIMER_DRV_VER_MAJ = 5;
-static u_short X1TIMER_DRV_VER_MIN = 1;
+static u_short X1TIMER_DRV_VER_MAJ = 6;
+static u_short X1TIMER_DRV_VER_MIN = 0;
 
 int X1TIMER_MAJOR = 48;    /* major by default */
 int X1TIMER_MINOR = 0 ;    /* minor by default */
@@ -132,9 +132,16 @@ static void register_x1timer_proc(int num, struct x1timer_dev     *x1timerdev)
 
 #else
     ssize_t x1timer_procinfo(struct file *filp,char *buf,size_t count,loff_t *offp );
+	
+   #if LINUX_VERSION_CODE > KERNEL_VERSION(5,6,1)	
+    static const struct proc_ops x1timer_proc_fops = { 
+        .proc_read = x1timer_procinfo,
+    }; 
+#else
     static const struct file_operations x1timer_proc_fops = { 
         .read = x1timer_procinfo,
     }; 
+#endif
     static void register_x1timer_proc(int num, struct x1timer_dev     *x1timerdev)
     {
         char prc_entr[32];
@@ -1267,9 +1274,11 @@ static ssize_t x1timer_write(struct file *filp, const char __user *buf, size_t c
     tmp_data_32  = reading.data_rw & 0xFFFFFFFF;
     
     
+/*
     if(tmp_offset == 0x3C){
         printk(KERN_ALERT "WRITING TO WORD_IRQ_ENABLE REGISTER %X process %i\n", tmp_data_32, current->group_leader->pid);
     }
+*/
     
     switch(tmp_barx){
         case 0:
@@ -1475,14 +1484,26 @@ static long  x1timer_ioctl(struct file *filp, unsigned int cmd, unsigned long ar
     * access_ok is kernel-oriented, so the concept of "read" and
     * "write" is reversed
     */
-    if (_IOC_DIR(cmd) & _IOC_READ)
-         err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
-    else if (_IOC_DIR(cmd) & _IOC_WRITE)
-         err =  !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
-    if (err) {
-        mutex_unlock(&dev->dev_mut);
-        return -EFAULT;
-    }
+  
+	#if LINUX_VERSION_CODE <= KERNEL_VERSION(4,20,17)
+	 if (_IOC_DIR(cmd) & _IOC_READ)
+			 err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
+	 else if (_IOC_DIR(cmd) & _IOC_WRITE)
+			 err =  !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
+	 if (err) {
+			mutex_unlock(&dev->dev_mut);
+			return -EFAULT;
+		}
+	 #else
+	if (_IOC_DIR(cmd))
+	{
+		err = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
+		if (err) {
+			mutex_unlock(&dev->dev_mut);
+			return -EFAULT;
+		}
+	}
+	#endif
 
     switch (cmd) {
         case X1TIMER_PHYSICAL_SLOT:

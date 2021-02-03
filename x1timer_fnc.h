@@ -27,6 +27,7 @@
 //#include <linux/version.h>
 //#include <linux/pci.h>
 #include <linux/list.h>
+#include "x1timer_io.h"
 #ifndef X1TIMER_NR_DEVS
 #define X1TIMER_NR_DEVS 15  /* x1timer0 through x1timer11 */
 #endif
@@ -40,6 +41,18 @@
 #define X1TIMER_IRQ_MODE_DEFAULT  	X1TIMER_IRQ_MODE_OFF
 #define X1TIMER_MAX_SERVER	 	0x25
 #define X1TIMER_MAX_DMA_SIZE	0x80000
+
+		
+#if LINUX_VERSION_CODE > KERNEL_VERSION(5,0,1)
+static inline void do_gettimeofday(struct timeval *tv)
+{
+	struct timespec64 now;
+
+	ktime_get_real_ts64(&now);
+	tv->tv_sec = now.tv_sec;
+	tv->tv_usec = now.tv_nsec/1000;
+}
+#endif
 
 struct x1timer_file_list {
     struct list_head node_file_list;
